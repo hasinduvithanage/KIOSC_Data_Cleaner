@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 from clean_vces import clean_vces
+from clean_discovery import clean_discovery
 
 
 def upload_and_clean(cleaning_function):
@@ -49,6 +50,16 @@ btn_vces = tk.Button(
     height=2,
 )
 btn_vces.pack(pady=5)
+
+btn_discovery = tk.Button(
+    main_frame,
+    text="Clean Discovery Survey",
+    command=lambda: upload_and_clean(clean_discovery),
+    font=("Arial", 12),
+    width=25,
+    height=2,
+)
+btn_discovery.pack(pady=5)
 
 btn_survey_a = tk.Button(
     main_frame,
