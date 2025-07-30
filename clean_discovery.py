@@ -33,17 +33,20 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
 
     df.columns = df.columns.str.strip()
 
+    # Print column names for debugging
+    print("COLUMN NAMES:", df.columns.tolist())
+
     def get_gender(row):
-        if row['Which of the following most accurately describes your gender?-Female'] == '1':
+        if row['Which of the following most accurately describes your gender? -Female'] == '1':
             return 'Female'
         elif row['Male'] == '1':
             return 'Male'
         elif row['Non-binary'] == '1':
             return 'Non-binary'
+        elif row['Let me explain'] == '1':
+            return row['Let me explain Comments']
         elif row['Rather not say'] == '1':
             return 'Rather not say'
-        elif row['Let me explain'] == '1':
-            return row.get('Let me explain Comments', 'Other')
         else:
             return 'Unknown'
 
@@ -51,8 +54,8 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
 
     def get_school_name(row):
         school_columns = [
-            "What school are you from? (If not listed, choose 'Other', and type your school name)-Bayswater Secondary College", "Boronia K-12 College", "Fairhills High School",
-            "Rowville Secondary College", "Scoresby Secondary College", "Wantirna College",
+            "Boronia K-12 College_69", "Boronia K-12 College_88", "Fairhills High School_70", "Fairhills High School_114",
+            "Rowville Secondary College_71", "Rowville Secondary College_162", "Scoresby Secondary College_72", "Scoresby Secondary College_163", "Wantirna College_73",
             "Alamanda College", "Albert Park Primary School", "Aquinas College", "Ashwood College",
             "Auburn High School", "Avila College", "Balwyn High School", "Balwyn Primary School",
             "Beaumaris Secondary College", "Bentleigh West Primary School", "Berwick Primary School",
@@ -82,7 +85,7 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
             "Strathmore Secondary College", "Swan Hill College", "Taylors Lakes Secondary College",
             "Tecoma Primary School", "Templestowe College", "Tintern Schools", "Upper Yarra Secondary College",
             "Upwey High School", "Vermont Secondary College", "Victoria Road Primary School",
-            "Viewbank College", "Wantirna College", "Wantirna South Primary School", "Warrandyte High School",
+            "Viewbank College", "Wantirna College_180", "Wantirna South Primary School", "Warrandyte High School",
             "Waverley Christian College", "Wellington College", "Wheelers Hill Secondary College", "Whitefriars College",
             "Whittlesea Secondary College", "Wodonga Middle School", "Woodleigh School",
             "Yarra Hills Secondary College", "Yarra Junction primary", "Yarra Valley Grammar School"
@@ -90,10 +93,13 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
 
         for school in school_columns:
             if school in row and str(row[school]) == '1':
-                return school.split('-', 1)[-1]
+                return school.split('_', 1)[0]
 
-        if 'Other' in row and str(row['Other']) == '1':
-            return row.get('Other Comments', 'Other')
+        if 'Other_193' in row and str(row['Other_193']) == '1':
+            return row.get('Other Comments_194', 'Other')
+
+        if "What school are you from? (If not listed, choose 'Other', and type your school name)-Bayswater Secondary College" in row and str(row["What school are you from? (If not listed, choose 'Other', and type your school name)-Bayswater Secondary College"]) == '1':
+            return 'Bayswater Secondary College'
 
         return 'Unknown'
 
@@ -123,33 +129,68 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
 
     df['Year Level'] = df.apply(get_year_level, axis=1)
 
+    # def get_program_name(row):
+    # List of all known programs
+    PROGRAM_NAMES = [
+        'Discovery: 3D Design and Merge',
+        'Discovery: Aspirin Analysis',
+        'Discovery: STEM to the Rescue',
+        'Discovery: Emergency Technology',
+        'Discovery: Forensic Science: Crack the COVID Case',
+        'Discovery: Forensic Science: Major Crime',
+        'Discovery: Genetics &amp; Micro arrays',
+        'Discovery: Hydrogen GRAND PRIX',
+        'Discovery: Logistic FAILs',
+        'Discovery: Makey Music Laser Cut Design',
+        'Discovery: OZGRAV Space',
+        'Discovery: TECHSprint',
+        'Discovery: Transformational Design',
+        'Discovery: TrashBot Challenge',
+        'Discovery: STEM Communication Conference',
+        'VCE Masterclass: Biology Unit 3: DNA Manipulation and Genetic Technologies',
+        'VCE Masterclass: Biology Unit 3: Photosynthesis and Biochemical Pathways',
+        'VCE Masterclass: Biology Unit 4: Evolution of Lemurs',
+        'VCE Masterclass: Chemistry Unit 2: Analytical Techniques Water',
+        'VCE Masterclass: Chemistry Unit 4: Organic Compounds',
+        'VCE Masterclass: Environmental Science Unit 2: Water Pollution',
+        'VCE Masterclass: Physics Unit 1: Thermodynamics',
+        'VCE Masterclass: Physics Unit 2: Mission Gravity with OzGrav',
+        'Discovery: Bioplastics',
+        'Discovery: Ocean Scratch 2',
+        'Discovery: Challenge Week',
+        'Discovery: Green Energy Revolution',
+        'Discovery: Sustianable Futures',
+        'Discovery: Physics',
+        'Discovery: Vitamin C Analysis',
+        'Discovery: LEGO Robotics',
+        'Discovery: Retro TECH Arcade',
+        'Discovery: Scratch AI',
+        'Discovery: Peer Support Training',
+        'Discovery: Sphero Space',
+        'Discovery: Drones on Mars',
+        'Discovery: Product Design',
+        'Discovery: Psychology: Brain Tech',
+        'Professional Learning: TechSprint',
+        'Professional Learning: Defence Program',
+        'Professional Learning: Hydrogen Car',
+        'Professional Learning: HBDI',
+        'Professional Learning: Co Spaces',
+        'Professional Learning – STEM Curriculum Planning',
+        'Work-Experience\xa0Program',
+        'Work-Experience Program SWLA',
+        'Internship-Analytics',
+        'Internship-Information Systems'
+    ]
+
     def get_program_name(row):
-        if str(row.get('What\xa0program did you attend?-Discovery: 3D Design and Merge', '')) == '1':
-            return 'Discovery: 3D Design and Merge'
-        elif str(row.get('Discovery: Aspirin Analysis', '')) == '1':
-            return 'Discovery: Aspirin Analysis'
-        elif str(row.get('Discovery: STEM to the Rescue', '')) == '1':
-            return 'Discovery: STEM to the Rescue'
-        elif str(row.get('Discovery: Emergency Technology', '')) == '1':
-            return 'Discovery: Emergency Technology'
-        elif str(row.get('Discovery: Forensic Science: Crack the COVID Case', '')) == '1':
-            return 'Discovery: Forensic Science: Crack the COVID Case'
-        elif str(row.get('Discovery: Forensic Science: Major Crime', '')) == '1':
-            return 'Discovery: Forensic Science: Major Crime'
-        elif str(row.get('Discovery: Genetics &amp; Micro arrays', '')) == '1':
-            return 'Discovery: Genetics & Micro arrays'
-        elif str(row.get('Discovery: Hydrogen GRAND PRIX', '')) == '1':
-            return 'Discovery: Hydrogen GRAND PRIX'
-        elif str(row.get('Discovery: Logistic FAILs', '')) == '1':
-            return 'Discovery: Logistic FAILs'
-        elif str(row.get('Discovery: Makey Music Laser Cut Design', '')) == '1':
-            return 'Discovery: Makey Music Laser Cut Design'
-        elif str(row.get('Discovery: OZGRAV Space', '')) == '1':
-            return 'Discovery: OZGRAV Space'
-        elif str(row.get('Discovery: TECHSprint', '')) == '1':
-            return 'Discovery: TECHSprint'
-        else:
-            return 'Unknown'
+        for program in PROGRAM_NAMES:
+            for col in row.keys():
+                if program in col and str(row[col]).strip() == '1':
+                    return program
+        if row.get('Other_64') == '1':
+            return row.get('Other Comments_65', 'Other')
+        return 'Unknown'
+
 
     df['Program Name'] = df.apply(get_program_name, axis=1)
 
@@ -172,6 +213,7 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
     df['Term'] = ''
     df['ATSI'] = ''
 
+    # the below column headers are just copied and pasted as is from the original CSV, no changes made
     selected_columns = [
         'Record Number',
         'Timestamp',
@@ -189,7 +231,8 @@ def clean_discovery(input_file: str) -> pd.DataFrame:
         'I used technology to help me learn',
         'I had the opportunity to collaborate with other students',
         'I learnt about industries that use science, technology, engineering, or maths (referred to as STEM) in my local area',
-        'If given the opportunity, would you like to attend another KIOSC program?'
+        'If given the opportunity, would you like to attend another KIOSC program?-Yes',
+        'The learning program I completed at the KIOSC met the Learning Intentions'
     ]
 
     df_selected = df[selected_columns]

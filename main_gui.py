@@ -33,12 +33,20 @@ def upload_and_clean(cleaning_function):
 
 root = tk.Tk()
 root.title("KIOSC Data Cleaner")
-root.geometry("450x300")
+root.geometry("650x500")
 
-main_frame = tk.Frame(root, padx=20, pady=20)
-main_frame.pack(expand=True, fill=tk.BOTH)
+# Load image (must be in same directory or provide full path)
+bg_image = tk.PhotoImage(file="bg.png")
 
-title_label = tk.Label(main_frame, text="Select Survey Type to Clean:", font=("Arial", 16))
+# Create label for background
+background_label = tk.Label(root, image=bg_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+# Main frame with transparent background
+main_frame = tk.Frame(root, bg="white", padx=20, pady=20)  # You can set bg to '' if you want transparency
+main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+title_label = tk.Label(main_frame, text="Select Survey Type to Clean:", font=("Arial", 16), bg="white")
 title_label.pack(pady=10)
 
 btn_vces = tk.Button(
@@ -63,22 +71,24 @@ btn_discovery.pack(pady=5)
 
 btn_survey_a = tk.Button(
     main_frame,
-    text="Clean Survey A (Not Implemented)",
+    text="Clean VCE Survey (Not Implemented)",
     font=("Arial", 12),
-    width=25,
+    width=35,
     height=2,
     state="disabled",
 )
 btn_survey_a.pack(pady=5)
 
-btn_survey_b = tk.Button(
-    main_frame,
-    text="Clean Survey B (Not Implemented)",
-    font=("Arial", 12),
-    width=25,
-    height=2,
-    state="disabled",
+instructions = (
+    "Instructions:\n"
+    "1. Choose the correct survey type.\n"
+    "2. Select the raw CSV file of the correct survey type you want to clean.\n"
+    "3. The program will automatically process the file. This will be instant.\n"
+    "4. You will be prompted to save the cleaned file.\n"
+    "5. A confirmation message will appear after saving.\n"
 )
-btn_survey_b.pack(pady=5)
+
+instruction_label = tk.Label(main_frame, text=instructions, font=("Arial", 11), bg="white", justify="left", anchor="w")
+instruction_label.pack(pady=(10, 5), fill="both")
 
 root.mainloop()
