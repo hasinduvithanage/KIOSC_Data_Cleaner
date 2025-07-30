@@ -3,6 +3,7 @@ from tkinter import filedialog, messagebox
 
 from clean_vces import clean_vces
 from clean_discovery import clean_discovery
+from clean_vce import clean_vce
 
 
 def upload_and_clean(cleaning_function):
@@ -69,15 +70,15 @@ btn_discovery = tk.Button(
 )
 btn_discovery.pack(pady=5)
 
-btn_survey_a = tk.Button(
+btn_vce = tk.Button(
     main_frame,
-    text="Clean VCE Survey (Not Implemented)",
+    text="Clean VCE Survey",
+    command=lambda: upload_and_clean(clean_vce),
     font=("Arial", 12),
-    width=35,
+    width=25,
     height=2,
-    state="disabled",
 )
-btn_survey_a.pack(pady=5)
+btn_vce.pack(pady=5)
 
 instructions = (
     "Instructions:\n"
