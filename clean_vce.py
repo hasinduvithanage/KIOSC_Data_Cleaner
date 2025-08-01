@@ -35,7 +35,7 @@ def clean_vce(input_file: str) -> pd.DataFrame:
     df.columns = df.columns.str.strip()
 
     def get_gender(row):
-        if row['Which of the following most accurately describes your gender? -Female'] == '1':
+        if row['Which of the following most accurately describes your gender?-Female'] == '1':
             return 'Female'
         elif row['Male'] == '1':
             return 'Male'
@@ -51,57 +51,21 @@ def clean_vce(input_file: str) -> pd.DataFrame:
     df['Gender'] = df.apply(get_gender, axis=1)
 
     def get_school_name(row):
-        school_columns = [
-            "What school are you from? (If not listed, choose 'Other', and type your school name) \u00a0-Bayswater Secondary College",
-            "Boronia K-12 College", "Fairhills High School", "Rowville Secondary College",
-            "Scoresby Secondary College", "Wantirna College", "Alamanda College",
-            "Albert Park Primary School", "Aquinas College", "Ashwood College",
-            "Auburn High School", "Avila College", "Balwyn High School", "Balwyn Primary School",
-            "Beaumaris Secondary College", "Bentleigh West Primary School", "Berwick Primary School",
-            "Billanook College", "Blackburn High School", "Box Hill High School", "Brentwood College",
-            "Brighton Secondary College", "Brunswick Secondary College", "CIRE Community School",
-            "Cambridge Primary School", "Canterbury Primary School", "Carranballac College",
-            "Caulfield Grammar", "Charlton College", "Coburg Primary School",
-            "Croydon Community School", "Dandenong High School", "Diamond Valley College",
-            "Doncaster Secondary College", "Donvale Christian College", "East Doncaster Secondary College",
-            "Edinburgh College", "Elliminyt Primary School", "Eltham High School", "Elwood College",
-            "Emerald Primary School", "Emerald Secondary College", "Emmaus College",
-            "Essendon Keilor College", "Forest Hill College", "Glen Waverley Secondary College",
-            "Hazel Glen College", "Healesville High School", "Heathmont East Primary School",
-            "Heathmont Secondary College", "Highvale Secondary College", "Kananook Primary School",
-            "Kew High School", "Keysborough College", "Killester College", "Knox School",
-            "Launching Place Primary School", "Lilydale Heights College", "Lilydale High School",
-            "Luther College", "Mansfield Secondary College", "Mary MacKillop Catholic Regional College",
-            "Mater Christi College", "Mazenod College", "McClelland College", "McKinnon Secondary College",
-            "Melba College", "Mill Park Primary School", "Monbulk College", "Mooroolbark College",
-            "Mount Evelyn Christian College", "Mount Lilydale Mercy College", "Mount Waverley Secondary College",
-            "Mountain District Christian School", "Mountain District Learning Centre", "Mullauna College",
-            "Narre Warren South P12 College", "Nazareth College", "North Ringwood Community House",
-            "Northern Bay P-12", "Norwood Secondary College", "Oakwood School",
-            "Our Lady of Sion College", "Oxley Christian College", "Oxley College", "Pines Learning Centre",
-            "Ranges TEC", "Reservoir West Primary School", "Richmond West primary school",
-            "Ringwood Secondary College", "Rosanna Golf Links Primary School", "Rowville Secondary College_3",
-            "Scoresby Secondary College_3", "Sherbrooke Community School", "South Melbourne Park Primary School",
-            "St Andrew's Christian College", "St Joseph's College", "St Kilda Park Primary School",
-            "Strathmore Secondary College", "Swan Hill College", "Taylors Lakes Secondary College",
-            "Tecoma Primary School", "Templestowe College", "Tintern Schools", "Upper Yarra Secondary College",
-            "Upwey High School", "Vermont Secondary College", "Victoria Road Primary School",
-            "Viewbank College", "Wantirna College_3", "Wantirna South Primary School", "Warrandyte High School",
-            "Waverley Christian College", "Wellington College", "Wheelers Hill Secondary College",
-            "Whitefriars College", "Whittlesea Secondary College", "Wodonga Middle School",
-            "Woodleigh School", "Yarra Hills Secondary College", "Yarra Junction primary",
-            "Yarra Valley Grammar School"
-        ]
+        # School responses appear as one-hot encoded columns with the school name
+        # as the header. The raw data may contain duplicate columns for multiple
+        # survey sections which are made unique by an index suffix (e.g. `_31`).
+        for col in row.index:
+            if (
+                ("School" in col or "College" in col or "House" in col or "Centre" in col)
+                and str(row[col]) == '1'
+            ):
+                return col.split('_', 1)[0]
 
-        for school in school_columns:
-            if school in row and str(row[school]) == '1':
-                return school.split('_', 1)[0]
-
-        if 'Other_2' in row and str(row['Other_2']) == '1':
-            return row.get('Other Comments_2', 'Other')
-
-        if 'Other_1' in row and str(row['Other_1']) == '1':
-            return row.get('Other Comments_1', 'Other')
+        # Handle 'Other' options which may also include a numbered suffix
+        for col in row.index:
+            if col.startswith('Other') and str(row[col]) == '1':
+                comments_col = col.replace('Other', 'Other Comments')
+                return row.get(comments_col, 'Other')
 
         return 'Unknown'
 
