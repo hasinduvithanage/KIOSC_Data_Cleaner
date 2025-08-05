@@ -35,7 +35,7 @@ def clean_vce(input_file: str) -> pd.DataFrame:
     df.columns = df.columns.str.strip()
 
     def get_gender(row):
-        if row['Which of the following most accurately describes your gender?-Female'] == '1':
+        if row['Which of the following most accurately describes your gender? -Female'] == '1':
             return 'Female'
         elif row['Male'] == '1':
             return 'Male'
@@ -61,17 +61,14 @@ def clean_vce(input_file: str) -> pd.DataFrame:
             ):
                 return col.split('_', 1)[0]
 
-        # Handle 'Other' options which may also include a numbered suffix
-        for col in row.index:
-            if col.startswith('Other') and str(row[col]) == '1':
-                comments_col = col.replace('Other', 'Other Comments')
-                return row.get(comments_col, 'Other')
+        if str(row.get('Other_156', '')) == '1':
+            return row.get('Other Comments_157', 'Other')
 
         return 'Unknown'
 
     df['School'] = df.apply(get_school_name, axis=1)
-    if 'Other Comments_1' in df.columns:
-        df.loc[df['School'] == 'Unknown', 'School'] = df['Other Comments_1']
+    if 'Other Comments_157' in df.columns:
+        df.loc[df['School'] == 'Unknown', 'School'] = df['Other Comments_157']
 
     def get_year_level(row):
         if row['What year level are you?-Year 5'] == '1':
@@ -118,8 +115,8 @@ def clean_vce(input_file: str) -> pd.DataFrame:
             return 'VCE Masterclass: Physics Unit 2: Mission Gravity with OzGrav'
         elif row['VCE Masterclass: Unit 4: Evolution of Lemurs'] == '1':
             return 'VCE Masterclass: Unit 4: Evolution of Lemurs'
-        elif row['Other'] == '1':
-            return row.get('Other Comments', 'Other')
+        elif row['Other_27'] == '1':
+            return row.get('Other Comments_28', 'Other')
         else:
             return 'Unknown'
 
