@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-from clean_vces import clean_vces
 from clean_discovery import clean_discovery
 from clean_vce import clean_vce
+from clean_vces import clean_vces
 
 
 def upload_and_clean(cleaning_function):
