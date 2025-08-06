@@ -23,6 +23,11 @@ def clean_vce(input_file: str) -> pd.DataFrame:
     # Build combined column names using the first row
     df.columns = [create_column_name(df.columns[i], df.iloc[0, i]) for i in range(len(df.columns))]
 
+    # # Clean column names
+    # df.columns = df.columns.str.replace("â€™", "'", regex=False)
+    # df.columns = df.columns.str.replace("\xa0", " ", regex=False)
+    # df.columns = df.columns.str.strip()
+
     # Remove the row used for column renaming
     df = df.iloc[1:].reset_index(drop=True)
 
@@ -33,6 +38,9 @@ def clean_vce(input_file: str) -> pd.DataFrame:
     df.columns = [f"{col}_{i}" if df.columns.tolist().count(col) > 1 else col for i, col in enumerate(df.columns)]
 
     df.columns = df.columns.str.strip()
+
+    # Print column names for debugging
+    print("COLUMN NAMES:", df.columns.tolist())
 
     def get_gender(row):
         if row['Which of the following most accurately describes your gender? -Female'] == '1':
@@ -50,21 +58,32 @@ def clean_vce(input_file: str) -> pd.DataFrame:
 
     df['Gender'] = df.apply(get_gender, axis=1)
 
-    def get_school_name(row):
         # School responses appear as one-hot encoded columns with the school name
         # as the header. The raw data may contain duplicate columns for multiple
         # survey sections which are made unique by an index suffix (e.g. `_31`).
+    def get_school_name(row):
+        # Combined header: long header that includes Bayswater Secondary College
         for col in row.index:
             if (
-                ("School" in col or "College" in col or "House" in col or "Centre" in col)
+                "Bayswater Secondary College" in col
                 and str(row[col]) == '1'
             ):
-                return col.split('_', 1)[0]
+                return "Bayswater Secondary College"
 
+        # General case: one-hot encoded school name columns
+        for col in row.index:
+            if (
+                any(word in col for word in ["School", "College", "House", "Centre"])
+                and str(row[col]) == '1'
+            ):
+                return col.rsplit('_', 1)[0]  # Removes _32 suffix, safer for names with _
+
+        # Handle "Other" option
         if str(row.get('Other_156', '')) == '1':
             return row.get('Other Comments_157', 'Other')
 
         return 'Unknown'
+
 
     df['School'] = df.apply(get_school_name, axis=1)
     if 'Other Comments_157' in df.columns:

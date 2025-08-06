@@ -36,13 +36,6 @@ root = tk.Tk()
 root.title("KIOSC Data Cleaner")
 root.geometry("650x500")
 
-# Load image (must be in same directory or provide full path)
-bg_image = tk.PhotoImage(file="bg.png")
-
-# Create label for background
-background_label = tk.Label(root, image=bg_image)
-background_label.place(x=0, y=0, relwidth=1, relheight=1)
-
 # Main frame with transparent background
 main_frame = tk.Frame(root, bg="white", padx=20, pady=20)  # You can set bg to '' if you want transparency
 main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
