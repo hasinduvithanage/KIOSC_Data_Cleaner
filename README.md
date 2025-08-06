@@ -19,7 +19,7 @@ Our goal is to ensure consistent, fast, and accurate data preparation, eliminati
 ## ✨ Features
 
 * **Intuitive Graphical User Interface (GUI):** Easy-to-use interface with clear options for selecting survey types.
-* **Survey-Specific Cleaning Logic:** Automated cleaning tailored for three distinct survey data formats (Survey A, Survey B, Survey C).
+* **Survey-Specific Cleaning Logic:** Automated cleaning tailored for three distinct survey data formats (Discovery, VCE, VCES).
 * **CSV File Handling:** Seamless upload of raw CSVs and saving of cleaned data.
 * **Offline Capability:** The application runs completely offline, requiring no internet connection after installation.
 * **Standalone Executable:** Distributed as a simple `.exe` file for easy installation and double-click execution on any Windows computer.
