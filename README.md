@@ -7,7 +7,7 @@
 This desktop application is designed to simplify and automate the data cleaning process for KIOSC staff. Currently, survey data collected from various programs is delivered in inconsistent CSV formats, leading to time-consuming, error-prone, and inconsistent manual cleaning efforts.
 
 This app aims to provide a **lightweight, user-friendly, and offline solution** that allows non-technical KIOSC staff to:
-1.  **Select** the specific type of survey data (e.g., Survey A, B, or C).
+1.  **Select** the specific type of survey data (e.g., Discovery, VCE, or VCES).
 2.  **Upload** the corresponding raw CSV file.
 3.  **Automatically clean** the data based on predefined, survey-specific logic.
 4.  **Save** the cleaned file, ready for immediate analysis.
