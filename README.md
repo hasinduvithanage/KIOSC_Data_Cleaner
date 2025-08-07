@@ -75,3 +75,5 @@ To run the application in development mode:
 
 ```bash
 python main_gui.py
+```
+Or run the local file
